@@ -170,6 +170,34 @@ code {
   }
 }
 
+$unordered-list-theme-color: $turquoise-500;
+
+.ba-single-page-content ba-page-content > ul,
+.ba-single-page-content ba-page-content > ol {
+  margin-left: 1rem;
+  display: block;
+  width: 100%;
+  max-width: calc(#{$max-text-width} - 1rem);
+
+  li {
+    position: relative;
+    margin-bottom: 0;
+  }
+
+  li:before {
+    content: ' ';
+    background-color: $unordered-list-theme-color;
+    width: 0.5rem;
+    height: 0.5rem;
+    position: relative;
+    margin-left: -1.25rem;
+    margin-right: 0.5rem;
+    margin-top: 0.4em;
+    vertical-align: top;
+    float: left;
+  }
+}
+
 @media (max-width: $table-breakpoint) {
   .ba-single-page-content ba-page-content > table {
     display: block;
