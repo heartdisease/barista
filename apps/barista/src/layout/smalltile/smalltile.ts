@@ -23,7 +23,6 @@ import { BaIndexPageItem } from '../../shared/page-contents';
   templateUrl: 'smalltile.html',
   styleUrls: ['smalltile.scss'],
   host: {
-    '[class]': '"ba-theme-" + _theme',
     '[class.ba-smalltile-link-wrapper]': 'data',
   },
 })
@@ -35,7 +34,7 @@ export class BaSmallTile {
     if (this.data) {
       switch (this.data.category) {
         case 'Brand':
-          return 'green';
+          return 'purple';
         case 'Resources':
           return 'blue';
         case 'Components':

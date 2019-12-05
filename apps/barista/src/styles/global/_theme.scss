@@ -1,0 +1,41 @@
+.dt-theme-blue {
+  --ba-pagetheme: #{$blue-600};
+  --ba-pagetheme-dark: #{$blue-700};
+  --ba-pagetheme-light: #{$blue-400};
+}
+
+.dt-theme-turquoise {
+  --ba-pagetheme: #{$turquoise-500};
+  --ba-pagetheme-dark: #{$turquoise-700};
+  --ba-pagetheme-light: #{$turquoise-400};
+}
+
+.dt-theme-purple {
+  --ba-pagetheme: #{$purple-600};
+  --ba-pagetheme-dark: #{$purple-700};
+  --ba-pagetheme-light: #{$purple-400};
+}
+
+.dt-theme-royalblue {
+  --ba-pagetheme: #{$royalblue-500};
+  --ba-pagetheme-dark: #{$royalblue-700};
+  --ba-pagetheme-light: #{$royalblue-400};
+}
+
+.dt-theme-yellow {
+  --ba-pagetheme: #{$yellow-600};
+  --ba-pagetheme-dark: #{$yellow-700};
+  --ba-pagetheme-light: #{$yellow-400};
+}
+
+.dt-theme-green {
+  --ba-pagetheme: #{$green-500};
+  --ba-pagetheme-dark: #{$green-700};
+  --ba-pagetheme-light: #{$green-400};
+}
+
+.dt-theme-gray {
+  --ba-pagetheme: #{$gray-640};
+  --ba-pagetheme-dark: #{$gray-700};
+  --ba-pagetheme-light: #{$gray-400};
+}
