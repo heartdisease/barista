@@ -16,22 +16,21 @@
 import { NgModule } from '@angular/core';
 import { DtShowMoreModule } from '@dynatrace/barista-components/show-more';
 import { DtExampleShowMoreDefault } from './show-more-default-example/show-more-default-example';
-import { DtExampleShowMoreNoText } from './show-more-notext-example/show-more-notext-example';
-import { DtExampleShowMoreInteractive } from './show-more-interactive-example/show-more-interactive-example';
 import { DtExampleShowMoreDisabled } from './show-more-disabled-example/show-more-disabled-example';
 import { DtExampleShowMoreDark } from './show-more-dark-example/show-more-dark-example';
+import { DtExampleShowMoreToggle } from './show-more-toggle-example/show-more-toggle-example';
 import { DtButtonModule } from '@dynatrace/barista-components/button';
+import { DtExpandablePanel } from '@dynatrace/barista-components/expandable-panel';
 
 export const DT_SHOW_MORE_EXAMPLES = [
   DtExampleShowMoreDefault,
-  DtExampleShowMoreNoText,
-  DtExampleShowMoreInteractive,
   DtExampleShowMoreDisabled,
   DtExampleShowMoreDark,
+  DtExampleShowMoreToggle,
 ];
 
 @NgModule({
-  imports: [DtShowMoreModule, DtButtonModule],
+  imports: [DtShowMoreModule, DtButtonModule, DtExpandablePanel],
   declarations: [...DT_SHOW_MORE_EXAMPLES],
   entryComponents: [...DT_SHOW_MORE_EXAMPLES],
 })
