@@ -41,6 +41,41 @@ const highlightedItems = [
   'Theming',
 ];
 
+function orderSectionItems(categoryNav: BaOverviewPage): BaOverviewPage {
+  for (const section of categoryNav.sections) {
+    const sectionItems = section.items;
+    if (section.title === 'Documentation') {
+      sectionItems.sort(function(
+        a: BaOverviewPageSectionItem,
+        b: BaOverviewPageSectionItem,
+      ): number {
+        if (a.order && b.order) {
+          return a.order - b.order;
+        }
+
+        if (b.order) {
+          return 1;
+        }
+
+        return -1;
+      });
+    } else {
+      sectionItems.sort(function(
+        a: BaOverviewPageSectionItem,
+        b: BaOverviewPageSectionItem,
+      ): number {
+        if (a.title < b.title) {
+          return -1;
+        } else {
+          return 1;
+        }
+      });
+    }
+    section.items = sectionItems;
+  }
+  return categoryNav;
+}
+
 function getOverviewSectionItem(
   filecontent: BaSinglePageMeta,
   section: string,
@@ -85,12 +120,14 @@ export const overviewBuilder = async () => {
 
   const pages = allDirectories.map(async directory => {
     const path = join(DIST_DIR, directory);
+    let overviewPage: BaOverviewPage;
 
     if (directory !== 'components') {
       const files = readdirSync(path);
       const capitalizedTitle =
         directory.charAt(0).toUpperCase() + directory.slice(1);
-      let overviewPage: BaOverviewPage = {
+
+      overviewPage = {
         title: capitalizedTitle,
         id: directory,
         layout: 'overview',
@@ -110,22 +147,10 @@ export const overviewBuilder = async () => {
           );
         }
       }
-
-      const overviewfilepath = join(DIST_DIR, `${directory}.json`);
-      // Write file with page content to disc.
-      // tslint:disable-next-line: no-magic-numbers
-      return fs.writeFile(
-        overviewfilepath,
-        JSON.stringify(overviewPage, null, 2),
-        {
-          flag: 'w', // "w" -> Create file if it does not exist
-          encoding: 'utf8',
-        },
-      );
     } else if (directory === 'components') {
       const files = readdirSync(path);
 
-      let componentOverview: BaOverviewPage = {
+      overviewPage = {
         title: 'Components',
         id: 'components',
         layout: 'overview',
@@ -149,7 +174,7 @@ export const overviewBuilder = async () => {
 
       for (const file of files) {
         const content = JSON.parse(readFileSync(join(path, file)).toString());
-        for (const section of componentOverview.sections) {
+        for (const section of overviewPage.sections) {
           const filepath = join(directory, file.replace(/\.[^/.]+$/, ''));
           if (
             content.navGroup === 'docs' &&
@@ -172,40 +197,21 @@ export const overviewBuilder = async () => {
           }
         }
       }
-
-      for (const section of componentOverview.sections) {
-        if (section.title === 'Documentation') {
-          const sectionItems = section.items;
-          sectionItems.sort(function(
-            a: BaOverviewPageSectionItem,
-            b: BaOverviewPageSectionItem,
-          ): number {
-            if (a.order && b.order) {
-              return a.order - b.order;
-            }
-
-            if (b.order) {
-              return 1;
-            }
-
-            return -1;
-          });
-          section.items = sectionItems;
-        }
-      }
-
-      const overviewfilepath = join(DIST_DIR, `${directory}.json`);
-      // Write file with page content to disc.
-      // tslint:disable-next-line: no-magic-numbers
-      return fs.writeFile(
-        overviewfilepath,
-        JSON.stringify(componentOverview, null, 2),
-        {
-          flag: 'w', // "w" -> Create file if it does not exist
-          encoding: 'utf8',
-        },
-      );
     }
+
+    overviewPage = orderSectionItems(overviewPage!);
+
+    const overviewfilepath = join(DIST_DIR, `${directory}.json`);
+    // Write file with page content to disc.
+    // tslint:disable-next-line: no-magic-numbers
+    return fs.writeFile(
+      overviewfilepath,
+      JSON.stringify(overviewPage, null, 2),
+      {
+        flag: 'w', // "w" -> Create file if it does not exist
+        encoding: 'utf8',
+      },
+    );
   });
   return Promise.all(pages);
 };
