@@ -21,6 +21,7 @@ import {
   BaOverviewPage,
   BaOverviewPageSectionItem,
   BaSinglePageMeta,
+  BaNav,
 } from '@dynatrace/barista-components/barista-definitions';
 
 const DIST_DIR = join(__dirname, '../../', 'apps', 'barista', 'data');
@@ -83,13 +84,23 @@ export const overviewBuilder = async () => {
     isDirectory(dirPath),
   );
 
+  let nav: BaNav = {
+    navItems: [],
+  };
+
   const pages = allDirectories.map(async directory => {
     const path = join(DIST_DIR, directory);
 
+    const capitalizedTitle =
+      directory.charAt(0).toUpperCase() + directory.slice(1);
+
+    nav.navItems.push({
+      label: capitalizedTitle,
+      url: `/${directory}/`,
+    });
+
     if (directory !== 'components') {
       const files = readdirSync(path);
-      const capitalizedTitle =
-        directory.charAt(0).toUpperCase() + directory.slice(1);
       let overviewPage: BaOverviewPage = {
         title: capitalizedTitle,
         id: directory,
@@ -122,7 +133,7 @@ export const overviewBuilder = async () => {
           encoding: 'utf8',
         },
       );
-    } else if (directory === 'components') {
+    } else {
       const files = readdirSync(path);
 
       let componentOverview: BaOverviewPage = {
@@ -207,5 +218,11 @@ export const overviewBuilder = async () => {
       );
     }
   });
+
+  fs.writeFile(join(DIST_DIR, 'nav.json'), JSON.stringify(nav, null, 2), {
+    flag: 'w', // "w" -> Create file if it does not exist
+    encoding: 'utf8',
+  });
+
   return Promise.all(pages);
 };

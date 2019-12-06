@@ -15,6 +15,11 @@
  */
 
 import { Component } from '@angular/core';
+import { environment } from '../../environments/environment';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+
+const CONTENT_PATH_PREFIX = 'data/';
 
 @Component({
   selector: 'ba-nav',
@@ -25,27 +30,11 @@ import { Component } from '@angular/core';
   },
 })
 export class BaNav {
-  // TODO: get nav items from page structure? don't hardcode...
-  navItems = [
-    {
-      label: 'Brand',
-      url: '/brand/',
-    },
-    {
-      label: 'Resources',
-      url: '/resources/',
-    },
-    {
-      label: 'Components',
-      url: '/components/',
-    },
-    {
-      label: 'Patterns',
-      url: '/patterns/',
-    },
-    {
-      label: 'Tools',
-      url: '/tools/',
-    },
-  ];
+  /** Data needed to render the navigation. */
+  _navData$: Observable<any>;
+
+  constructor(http: HttpClient) {
+    const requestPath = `${environment.dataHost}${CONTENT_PATH_PREFIX}nav.json`;
+    this._navData$ = http.get(requestPath, { responseType: 'json' });
+  }
 }
