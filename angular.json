@@ -475,6 +475,23 @@
       "projectType": "application",
       "architect": {
         "build": {
+          "builder": "@nrwl/workspace:run-commands",
+          "options": {
+            "parallel": true,
+            "commands": [
+              {
+                "command": "yarn ng run universal:build-frontend --configuration=production"
+              },
+              {
+                "command": "yarn ng run universal:build-server && yarn ng run universal:build-express"
+              }
+            ]
+          },
+          "configurations": {
+            "production": {}
+          }
+        },
+        "build-frontend": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
             "outputPath": "dist/apps/universal",
@@ -490,8 +507,13 @@
               },
               {
                 "glob": "*.svg",
-                "input": "node_modules/@dynatrace/dt-iconpack",
+                "input": "node_modules/@dynatrace/barista-icons",
                 "output": "/assets/icons"
+              },
+              {
+                "glob": "**/*",
+                "input": "node_modules/@dynatrace/barista-fonts/fonts/",
+                "output": "/fonts"
               }
             ],
             "styles": ["components/style/index.scss"],
@@ -513,13 +535,7 @@
             }
           }
         },
-        "serve": {
-          "builder": "@angular-devkit/build-angular:dev-server",
-          "options": {
-            "browserTarget": "universal:build"
-          }
-        },
-        "server": {
+        "build-server": {
           "builder": "@angular-devkit/build-angular:server",
           "options": {
             "outputPath": "dist/apps/universal-server",
@@ -529,6 +545,20 @@
             "outputHashing": "none",
             "sourceMap": false,
             "extractLicenses": false
+          }
+        },
+        "build-express": {
+          "builder": "@nrwl/node:build",
+          "options": {
+            "outputPath": "dist/apps/universal-ssr",
+            "main": "apps/universal/src/server.ts",
+            "tsConfig": "apps/universal/tsconfig.express.json"
+          }
+        },
+        "serve": {
+          "builder": "@angular-devkit/build-angular:dev-server",
+          "options": {
+            "browserTarget": "universal:build-frontend"
           }
         },
         "lint": {
@@ -542,18 +572,37 @@
             "exclude": ["**/node_modules/**", "!apps/universal/**"]
           }
         },
-        "ssr": {
-          "builder": "@nrwl/node:build",
-          "options": {
-            "outputPath": "dist/apps/universal-ssr",
-            "main": "apps/universal/src/server.ts",
-            "tsConfig": "apps/universal/tsconfig.express.json"
-          }
-        },
-        "run-ssr": {
+        "run-express": {
           "builder": "@nrwl/node:execute",
           "options": {
-            "buildTarget": "universal:ssr"
+            "buildTarget": "universal:build-express"
+          }
+        },
+        "e2e": {
+          "builder": "@politie/angular-testcafe-builder:testcafe",
+          "options": {
+            "devServerTarget": "universal:run-express",
+            "src": "apps/universal/src/**/*.{e2e,po}.ts",
+            "browsers": ["chrome"],
+            "reporters": [
+              {
+                "name": "spec"
+              },
+              {
+                "name": "xunit",
+                "output": "dist/universal/report.xml"
+              }
+            ],
+            "concurrency": 1,
+            "skipJsErrors": false
+          },
+          "configurations": {
+            "remote": {
+              "browsers": ["browserstack:chrome"]
+            },
+            "watch": {
+              "live": true
+            }
           }
         }
       }

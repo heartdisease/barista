@@ -187,7 +187,8 @@ jobs:
           at: ~/barista
       - run:
           <<: *set_env
-      - run: yarn affected:build ${AFFECTED_ARGS} --parallel --configuration=production
+      # - run: yarn affected:build ${AFFECTED_ARGS} --parallel --configuration=production
+      - run: yarn ng build universal
       - save_cache:
           key: build-{{ .Environment.CIRCLE_WORKFLOW_ID }}
           paths:
@@ -282,6 +283,9 @@ workflows:
             - install
       - e2e-test:
           requires:
+            - build
+      - build:
+          requires:
             - install
       - save-latest:
           filters:
@@ -295,6 +299,4 @@ workflows:
             - lint-styles
             - unit-test
             - e2e-test
-      # - build:
-      #     requires:
-      #       - install
+            - build

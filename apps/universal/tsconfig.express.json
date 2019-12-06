@@ -2,7 +2,10 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "outDir": "../../dist/out-tsc",
+    "module": "commonjs",
+    "target": "esnext",
     "types": ["node"]
   },
-  "files": ["server.ts"]
+  "files": ["./src/server.ts"],
+  "exclude": ["src/server.ts", "**/*.spec.ts", "**/*.e2e.ts", "**/*.po.ts"]
 }
