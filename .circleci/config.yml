@@ -188,7 +188,7 @@ jobs:
       - run:
           <<: *set_env
       # - run: yarn affected:build ${AFFECTED_ARGS} --parallel --configuration=production
-      - run: yarn ng build universal
+      - run: npx ng build universal
       - save_cache:
           key: build-{{ .Environment.CIRCLE_WORKFLOW_ID }}
           paths:
@@ -263,40 +263,40 @@ workflows:
   pr_check:
     jobs:
       - install
-      - check-formatting:
-          requires:
-            - install
-      - sonar:
-          requires:
-            - install
-      - security-checks:
-          requires:
-            - install
-      - lint:
-          requires:
-            - install
-      - lint-styles:
-          requires:
-            - install
-      - unit-test:
-          requires:
-            - install
+      # - check-formatting:
+      #     requires:
+      #       - install
+      # - sonar:
+      #     requires:
+      #       - install
+      # - security-checks:
+      #     requires:
+      #       - install
+      # - lint:
+      #     requires:
+      #       - install
+      # - lint-styles:
+      #     requires:
+      #       - install
+      # - unit-test:
+      #     requires:
+      #       - install
       - e2e-test:
           requires:
             - build
       - build:
           requires:
             - install
-      - save-latest:
-          filters:
-            branches:
-              only: /^([0-9]{1,}\.x|[0-9]{1,}\.[0-9]{1,}\.x|master)$/
-          requires:
-            - check-formatting
-            - sonar
-            - security-checks
-            - lint
-            - lint-styles
-            - unit-test
-            - e2e-test
-            - build
+      # - save-latest:
+      #     filters:
+      #       branches:
+      #         only: /^([0-9]{1,}\.x|[0-9]{1,}\.[0-9]{1,}\.x|master)$/
+      #     requires:
+      #       - check-formatting
+      #       - sonar
+      #       - security-checks
+      #       - lint
+      #       - lint-styles
+      #       - unit-test
+      #       - e2e-test
+      #       - build

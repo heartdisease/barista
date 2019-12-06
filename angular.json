@@ -477,13 +477,16 @@
         "build": {
           "builder": "@nrwl/workspace:run-commands",
           "options": {
-            "parallel": true,
+            "parallel": false,
             "commands": [
               {
-                "command": "yarn ng run universal:build-frontend --configuration=production"
+                "command": "npx ng run universal:build-frontend --configuration=production"
               },
               {
-                "command": "yarn ng run universal:build-server && yarn ng run universal:build-express"
+                "command": "npx ng run universal:build-server"
+              },
+              {
+                "command": "npx ng run universal:build-express"
               }
             ]
           },
