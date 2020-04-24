@@ -37,7 +37,9 @@ import {
   ViewEncapsulation,
 } from '@angular/core';
 
-import { DtOptgroup, DtOption } from '@dynatrace/barista-components/core';
+import { DtOption } from '@dynatrace/barista-components/core';
+import { BehaviorSubject } from 'rxjs';
+import { startWith } from 'rxjs/operators';
 
 let _uniqueIdCounter = 0;
 
@@ -79,7 +81,7 @@ export function DT_AUTOCOMPLETE_DEFAULT_OPTIONS_FACTORY(): DtAutocompleteDefault
     class: 'dt-autocomplete',
   },
   preserveWhitespaces: false,
-  encapsulation: ViewEncapsulation.Emulated,
+  encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DtAutocomplete<T> implements AfterContentInit, AfterViewInit {
@@ -172,16 +174,28 @@ export class DtAutocomplete<T> implements AfterContentInit, AfterViewInit {
    */
   @ViewChild('panel') _panel: ElementRef;
 
+  _additionalPortal: TemplatePortal;
+
   /**
    * @internal References to all the options that are currently applied.
    */
   @ContentChildren(DtOption, { descendants: true })
-  _options: QueryList<DtOption<T>>;
+  _projectedOptions: QueryList<DtOption<T>>;
 
-  /**
-   * @interal References to all the option groups that are currently applied.
-   */
-  @ContentChildren(DtOptgroup) _optionGroups: QueryList<DtOptgroup>;
+  get _additionalOptions(): DtOption<T>[] {
+    return this._additionalOptionsInternal;
+  }
+  set _additionalOptions(val: DtOption<T>[]) {
+    this._additionalOptionsInternal = val;
+    this._combineOptions();
+  }
+  private _additionalOptionsInternal: DtOption<T>[] = [];
+
+  _options$ = new BehaviorSubject<DtOption<T>[]>([]);
+
+  get _options(): DtOption<T>[] {
+    return this._options$.value;
+  }
 
   constructor(
     private _changeDetectorRef: ChangeDetectorRef,
@@ -198,11 +212,16 @@ export class DtAutocomplete<T> implements AfterContentInit, AfterViewInit {
   }
 
   ngAfterContentInit(): void {
-    this._keyManager = new ActiveDescendantKeyManager<DtOption<T>>(
-      this._options,
-    ).withWrap();
-    // Set the initial visibility state.
-    this._setVisibility();
+    this._projectedOptions.changes.pipe(startWith(null)).subscribe(() => {
+      this._combineOptions();
+    });
+    this._options$.subscribe((options) => {
+      this._keyManager = new ActiveDescendantKeyManager<DtOption<T>>(
+        options,
+      ).withWrap();
+      // Set the initial visibility state.
+      this._setVisibility();
+    });
   }
 
   /**
@@ -210,7 +229,7 @@ export class DtAutocomplete<T> implements AfterContentInit, AfterViewInit {
    * Panel should hide itself when the option list is empty.
    */
   _setVisibility(): void {
-    this.showPanel = !!this._options.length;
+    this.showPanel = !!this._options$.value.length;
     this._setVisibilityClasses(this._classList);
     this._changeDetectorRef.markForCheck();
   }
@@ -241,6 +260,12 @@ export class DtAutocomplete<T> implements AfterContentInit, AfterViewInit {
   _emitSelectEvent(option: DtOption<T>): void {
     const event = new DtAutocompleteSelectedEvent(this, option);
     this.optionSelected.emit(event);
+  }
+
+  private _combineOptions(): void {
+    this._options$.next(
+      this._projectedOptions.toArray().concat(this._additionalOptionsInternal),
+    );
   }
 
   /** Sets the autocomplete visibility classes on a classlist based on the panel is visible. */

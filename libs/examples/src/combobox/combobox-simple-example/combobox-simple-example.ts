@@ -14,10 +14,52 @@
  * limitations under the License.
  */
 
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component } from '@angular/core';
+import { take } from 'rxjs/operators';
+import { timer } from 'rxjs';
+
+const allOptions: { name: string; value: string }[] = [
+  { name: 'Value 1', value: '[value: Value 1]' },
+  { name: 'Value 2', value: '[value: Value 2]' },
+  { name: 'Value 3', value: '[value: Value 3]' },
+  { name: 'Value 4', value: '[value: Value 4]' },
+];
 
 @Component({
   selector: 'dt-example-simple-combobox',
   templateUrl: './combobox-simple-example.html',
 })
-export class DtExampleComboboxSimple {}
+export class DtExampleComboboxSimple {
+  _initialValue = allOptions[0];
+  _options = [...allOptions];
+  _loading = false;
+  _displayWith = (option: { name: string; value: string }) => option.name;
+
+  constructor(private _changeDetectorRef: ChangeDetectorRef) {}
+
+  openedChanged(event: boolean): void {
+    console.log(`openedChanged: '${event}'`);
+  }
+
+  valueChanged(event: string): void {
+    console.log(`valueChanged: '${event}'`);
+  }
+
+  filterChanged(event: string): void {
+    console.log(`filterChanged: '${event}'`);
+
+    this._loading = true;
+    this._changeDetectorRef.markForCheck();
+
+    timer(1500)
+      .pipe(take(1))
+      .subscribe(() => {
+        this._options = allOptions.filter(
+          (option) =>
+            option.value.toLowerCase().indexOf(event.toLowerCase()) >= 0,
+        );
+        this._loading = false;
+        this._changeDetectorRef.markForCheck();
+      });
+  }
+}

@@ -1,3 +1,71 @@
+@import '../../style/font-mixins';
+@import '../../core/src/style/variables';
+@import '../../core/src/style/form-control';
+@import '../../core/src/style/interactive-common';
+
 :host {
-  display: block;
+  position: relative;
+  display: inline-block;
+  box-sizing: border-box;
+  outline: none;
+  max-width: 100%;
+  @include dt-main-font();
+  @include dt-form-control();
+  @include dt-cdkmonitor-focus-style();
+
+  &.dt-checkbox-disabled {
+    .dt-combobox-trigger {
+      pointer-events: none;
+    }
+
+    .dt-combobox-arrow {
+      fill: $gray-500;
+    }
+  }
+
+  &.dt-checkbox-loading {
+    .dt-combobox-arrow {
+      display: none;
+    }
+
+    .dt-combobox-spinner {
+      display: block;
+      width: 16px;
+      height: 16px;
+      fill: $gray-500;
+    }
+  }
+
+  &.dt-checkbox-open .dt-combobox-arrow {
+    transform: rotate(180deg);
+  }
+}
+
+.dt-combobox-trigger {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  top: 0;
+  right: 0;
+  padding-right: 4px;
+  width: 20px;
+  height: 100%;
+}
+
+.dt-combobox-arrow {
+  width: 16px;
+  height: 16px;
+  line-height: 0;
+  transform: rotate(0);
+  transition: transform 150ms ease-out;
+
+  ::ng-deep svg {
+    fill: $linkcolor;
+    width: 100%;
+    height: 100%;
+  }
+}
+
+.dt-combobox-spinner {
+  display: none;
 }
