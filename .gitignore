@@ -29,6 +29,7 @@ yarn.lock
 !/.vscode/extensions.json
 
 # misc
+/libs/workspace/tsconfig.nx-tmp
 /.sass-cache
 /connect.lock
 /coverage
@@ -66,7 +67,6 @@ Thumbs.db
 /tools/bitbucket-tools/dist/
 
 .now
-
 
 # bazel
 bazel-*
