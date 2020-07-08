@@ -18,21 +18,26 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
-  ViewChild,
 } from '@angular/core';
 import { take } from 'rxjs/operators';
 import { timer } from 'rxjs';
-import {
-  DtCombobox,
-  DtComboboxFilterChange,
-} from '@dynatrace/barista-components/experimental/combobox';
+import { DtComboboxFilterChange } from '@dynatrace/barista-components/experimental/combobox';
 
-const allOptions: { name: string; value: string }[] = [
-  { name: 'Value 3', value: '[value: Value 3]' },
+interface Suggestion {
+  readonly name: string;
+  readonly value: string;
+}
+
+const allOptions: Suggestion[] = [
+  { name: 'Value 1', value: '[value: Value 1]' },
   { name: 'Value 2', value: '[value: Value 2]' },
-  { name: 'Value 31', value: '[value: Value 31]' },
+  { name: 'Value 3', value: '[value: Value 3]' },
   { name: 'Value 4', value: '[value: Value 4]' },
 ];
+
+function matches(name: string, filter: string): boolean {
+  return name.toLowerCase().indexOf(filter.toLowerCase()) >= 0;
+}
 
 @Component({
   selector: 'combobox-dev-app-demo',
@@ -40,16 +45,12 @@ const allOptions: { name: string; value: string }[] = [
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ComboboxDemo {
-  @ViewChild(DtCombobox) combobox: DtCombobox<any>;
-
   _initialValue = allOptions[0];
-  _options = [...allOptions].filter(
-    (option) =>
-      option.value.toLowerCase().indexOf(allOptions[0].value.toLowerCase()) >=
-      0,
+  _options = [...allOptions].filter((option) =>
+    matches(option.name, allOptions[0].name),
   );
   _loading = false;
-  _displayWith = (option: { name: string; value: string }) => option.name;
+  _displayWith = (option: Suggestion) => option.name;
 
   constructor(private _changeDetectorRef: ChangeDetectorRef) {}
 
@@ -57,11 +58,9 @@ export class ComboboxDemo {
     console.log(`openedChanged: '${event}'`);
   }
 
-  valueChanged(event: { name: string; value: string }): void {
-    console.log('valueChanged', event);
-    this._options = [...allOptions].filter(
-      (option) =>
-        option.value.toLowerCase().indexOf(event.value.toLowerCase()) >= 0,
+  valueChanged(event: Suggestion): void {
+    this._options = [...allOptions].filter((option) =>
+      matches(option.name, event.name),
     );
   }
 
@@ -74,19 +73,11 @@ export class ComboboxDemo {
     timer(1500)
       .pipe(take(1))
       .subscribe(() => {
-        this._options = allOptions.filter(
-          (option) =>
-            option.value.toLowerCase().indexOf(event.filter.toLowerCase()) >= 0,
+        this._options = allOptions.filter((option) =>
+          matches(option.name, event.filter),
         );
         this._loading = false;
         this._changeDetectorRef.markForCheck();
       });
   }
-
-  selectedValue: string;
-  coffees = [
-    { value: 'ThePerfectPour', viewValue: 'ThePerfectPour' },
-    { value: 'Affogato', viewValue: 'Affogato' },
-    { value: 'Americano', viewValue: 'Americano' },
-  ];
 }
