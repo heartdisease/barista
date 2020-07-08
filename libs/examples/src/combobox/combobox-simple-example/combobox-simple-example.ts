@@ -19,12 +19,21 @@ import { take } from 'rxjs/operators';
 import { timer } from 'rxjs';
 import { DtComboboxFilterChange } from '@dynatrace/barista-components/experimental/combobox';
 
-const allOptions: { name: string; value: string }[] = [
+interface Suggestion {
+  readonly name: string;
+  readonly value: string;
+}
+
+const allOptions: Suggestion[] = [
   { name: 'Value 1', value: '[value: Value 1]' },
   { name: 'Value 2', value: '[value: Value 2]' },
   { name: 'Value 3', value: '[value: Value 3]' },
   { name: 'Value 4', value: '[value: Value 4]' },
 ];
+
+function matches(name: string, filter: string): boolean {
+  return name.toLowerCase().indexOf(filter.toLowerCase()) >= 0;
+}
 
 @Component({
   selector: 'dt-example-simple-combobox',
@@ -32,27 +41,21 @@ const allOptions: { name: string; value: string }[] = [
 })
 export class DtExampleComboboxSimple {
   _initialValue = allOptions[0];
-  _options = [...allOptions].filter(
-    (option) =>
-      option.name.toLowerCase().indexOf(allOptions[0].name.toLowerCase()) >= 0,
+  _options = [...allOptions].filter((option) =>
+    matches(option.name, allOptions[0].name),
   );
   _loading = false;
-  _displayWith = (option: { name: string; value: string }) => option.name;
+  _displayWith = (option: Suggestion) => option.name;
 
   constructor(private _changeDetectorRef: ChangeDetectorRef) {}
-
-  setOptions(): void {
-    this._options = [...allOptions];
-  }
 
   openedChanged(event: boolean): void {
     console.log(`openedChanged: '${event}'`);
   }
 
-  valueChanged(event: { name: string; value: string }): void {
-    this._options = [...allOptions].filter(
-      (option) =>
-        option.name.toLowerCase().indexOf(event.name.toLowerCase()) >= 0,
+  valueChanged(event: Suggestion): void {
+    this._options = [...allOptions].filter((option) =>
+      matches(option.name, event.name),
     );
   }
 
@@ -65,9 +68,8 @@ export class DtExampleComboboxSimple {
     timer(1500)
       .pipe(take(1))
       .subscribe(() => {
-        this._options = allOptions.filter(
-          (option) =>
-            option.name.toLowerCase().indexOf(event.filter.toLowerCase()) >= 0,
+        this._options = allOptions.filter((option) =>
+          matches(option.name, event.filter),
         );
         this._loading = false;
         this._changeDetectorRef.markForCheck();
